@@ -24,7 +24,9 @@ class Build : NukeBuild
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
 
-    public static int Main () => Execute<Build>(x => x.Compile);
+    public static int Main () => Execute<Build>(
+        x => x.UnitTests,
+        x => x.Pack);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -33,9 +35,9 @@ class Build : NukeBuild
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion] readonly GitVersion GitVersion;
 
-    AbsolutePath SourceDirectory => RootDirectory / "src";
-    AbsolutePath TestsDirectory => RootDirectory / "tests";
-    AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+    AbsolutePath SourceDirectory => RootDirectory / "Src";
+    AbsolutePath TestsDirectory => RootDirectory / "Tests";
+    AbsolutePath ArtifactsDirectory => RootDirectory / "Artifacts";
 
     Target Clean => _ => _
         .Before(Restore)
@@ -66,4 +68,24 @@ class Build : NukeBuild
                 .EnableNoRestore());
         });
 
+    Target UnitTests => _ => _
+        .DependsOn(Compile)
+        .Executes(() =>
+        {
+            DotNetTest(s => s
+                .SetProjectFile(Solution.GetProject("FluentAssertions.Reactive.Specs"))
+                .SetConfiguration(Configuration.Debug)
+                .CombineWith(cc => cc.SetFramework("netcoreapp3.1")));
+        });
+
+    Target Pack => _ => _
+        .DependsOn(UnitTests)
+        .Executes(() =>
+        {
+            DotNetPack(s => s
+                .SetProject(Solution.GetProject("FluentAssertions.Reactive"))
+                .SetOutputDirectory(ArtifactsDirectory)
+                .SetConfiguration(Configuration.Release)
+                .SetVersion(GitVersion.NuGetVersionV2));
+        });
 }
