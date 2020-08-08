@@ -1,11 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30330.147
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{00D5194F-4335-4B15-B486-7DB272B65547}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentAssertions.Reactive", "Src\FluentAssertions.Reactive\FluentAssertions.Reactive.csproj", "{FBBA1F0F-2782-4C58-9F66-2CFCBAF043C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentAssertions.Reactive", "Src\FluentAssertions.Reactive\FluentAssertions.Reactive.csproj", "{FBBA1F0F-2782-4C58-9F66-2CFCBAF043C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FF4404AB-62EB-4964-AA9C-E62364EC6952}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentAssertions.Reactive.Specs", "Tests\FluentAssertions.Reactive.Specs\FluentAssertions.Reactive.Specs.csproj", "{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0593589C-673C-47EB-8B56-E6B83DA2580E}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +24,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FBBA1F0F-2782-4C58-9F66-2CFCBAF043C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -32,8 +38,27 @@ Global
 		{FBBA1F0F-2782-4C58-9F66-2CFCBAF043C2}.Release|x64.Build.0 = Release|Any CPU
 		{FBBA1F0F-2782-4C58-9F66-2CFCBAF043C2}.Release|x86.ActiveCfg = Release|Any CPU
 		{FBBA1F0F-2782-4C58-9F66-2CFCBAF043C2}.Release|x86.Build.0 = Release|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Debug|x64.Build.0 = Debug|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Debug|x86.Build.0 = Debug|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Release|x64.ActiveCfg = Release|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Release|x64.Build.0 = Release|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Release|x86.ActiveCfg = Release|Any CPU
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FBBA1F0F-2782-4C58-9F66-2CFCBAF043C2} = {00D5194F-4335-4B15-B486-7DB272B65547}
+		{F7FA72E3-365F-4F5C-8B5B-377DDE9B8B2F} = {FF4404AB-62EB-4964-AA9C-E62364EC6952}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FB99E965-4EAB-437C-A80D-DB5934C53CE6}
 	EndGlobalSection
 EndGlobal
