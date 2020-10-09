@@ -21,7 +21,7 @@ jobs:
     - name: Restore dotnet tools
       run: dotnet tool restore
     - name: Fetch complete repository including tags
-      run: git fetch --tags --force --prune && git describe
+      run: git fetch --tags --force --prune
     - name: Generate version info from git history
       run: dotnet gitversion /output json | jq -r 'to_entries|map("GitVersion_\(.key)=\(.value|tostring)")|.[]' >> gitversion.env && cat gitversion.env
     - name: Upload version info file
