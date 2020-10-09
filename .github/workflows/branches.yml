@@ -43,7 +43,7 @@ jobs:
         name: gitversion
         path: ./
     - name: Inject version info into environment
-      run: gitversion.env >> $GITHUB_ENV
+      run: cat ./gitversion.env >> $GITHUB_ENV
     - name: Build solution
       run: echo "Current version is \"$GitVersion_SemVer\"" && dotnet build -c Release
     - name: Create NuGet packages
@@ -67,6 +67,6 @@ jobs:
         name: gitversion
         path: ./
     - name: Inject version info into environment
-      run: gitversion.env >> $GITHUB_ENV
+      run: cat ./gitversion.env >> $GITHUB_ENV
     - name: Run tests
       run: echo "Current version is \"$GitVersion_SemVer\"" && dotnet test -c Release
