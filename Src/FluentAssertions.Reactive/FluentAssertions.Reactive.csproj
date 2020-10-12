@@ -2,6 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Alexander Rose</Authors>
+    <PackageDescription>
+      An extension to use FluidAssertions to test code using the System.Reactive library
+    </PackageDescription>
+    <RepositoryUrl>https://github.com/fluentassertions/fluentassertions.reactive</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>MSTest2;xUnit;NUnit;MSpec;NSpec;TDD;BDD;Fluent;netcore;netstandard;uwp;Reactive</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIcon>FluentAssertions.png</PackageIcon>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,10 +25,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="GitVersionTask" Version="5.3.4">
+    <PackageReference Include="GitVersionTask" Version="5.3.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="all" />
+    <None Include="..\FluentAssertions.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(GitVersion_SemVer)' != ''">

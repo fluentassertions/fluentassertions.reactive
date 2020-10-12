@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30330.147
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{00D5194F-4335-4B15-B486-7DB272B65547}"
+	ProjectSection(SolutionItems) = preProject
+		Src\FluentAssertions.png = Src\FluentAssertions.png
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentAssertions.Reactive", "Src\FluentAssertions.Reactive\FluentAssertions.Reactive.csproj", "{FBBA1F0F-2782-4C58-9F66-2CFCBAF043C2}"
 EndProject
