@@ -11,7 +11,9 @@
     <PackageDescription>
       An extension to use FluidAssertions to test code using the System.Reactive library
     </PackageDescription>
-    <RepositoryUrl>https://github.com/fluentassertions/fluentassertions.reactive</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/fluentassertions/fluentassertions.reactive</PackageProjectUrl>
+    <PackageReleaseNotes>See https://github.com/fluentassertions/fluentassertions.reactive/releases</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/fluentassertions/fluentassertions.reactive.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>MSTest2;xUnit;NUnit;MSpec;NSpec;TDD;BDD;Fluent;netcore;netstandard;uwp;Reactive</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
