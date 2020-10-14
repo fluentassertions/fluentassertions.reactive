@@ -1,7 +1,4 @@
-
+mode: ContinuousDeployment
 branches:
-  release:
-    regex: releases?[/-]
-    tag: rc
-ignore:
-  sha: []
+  master:
+    tag: alpha
