@@ -11,10 +11,10 @@ Extensions for the [Fluent Assertions](https://www.fluentassertions.com) for tes
 var observable = Observable.Empty<Unit>();
 
 // observe the sequence
-using var observer = observable.Observe();
+using var observedSequence = observable.Observe();
 
 // assert the behaviour of the sequence
-observer.Should().Complete();
+observedSequence.Should().Complete();
 
 ```
 
