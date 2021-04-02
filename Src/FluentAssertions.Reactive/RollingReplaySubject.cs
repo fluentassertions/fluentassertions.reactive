@@ -11,39 +11,39 @@ namespace FluentAssertions.Reactive
     /// <typeparam name="T"></typeparam>
     public class RollingReplaySubject<T> : ISubject<T>, IDisposable
     {
-        private readonly ReplaySubject<IObservable<T>> _subjects;
-        private readonly IObservable<T> _concatenatedSubjects;
-        private ISubject<T> _currentSubject;
+        private readonly ReplaySubject<IObservable<T>> subjects;
+        private readonly IObservable<T> concatenatedSubjects;
+        private ISubject<T> currentSubject;
 
         public RollingReplaySubject()
         {
-            _subjects = new ReplaySubject<IObservable<T>>(1);
-            _concatenatedSubjects = _subjects.Concat();
-            _currentSubject = new ReplaySubject<T>();
-            _subjects.OnNext(_currentSubject);
+            subjects = new ReplaySubject<IObservable<T>>(1);
+            concatenatedSubjects = subjects.Concat();
+            currentSubject = new ReplaySubject<T>();
+            subjects.OnNext(currentSubject);
         }
 
         public void Clear()
         {
-            _currentSubject.OnCompleted();
-            _currentSubject = new ReplaySubject<T>();
-            _subjects.OnNext(_currentSubject);
+            currentSubject.OnCompleted();
+            currentSubject = new ReplaySubject<T>();
+            subjects.OnNext(currentSubject);
         }
 
-        public void OnNext(T value) => _currentSubject.OnNext(value);
+        public void OnNext(T value) => currentSubject.OnNext(value);
 
-        public void OnError(Exception error) => _currentSubject.OnError(error);
+        public void OnError(Exception error) => currentSubject.OnError(error);
 
         public void OnCompleted()
         {
-            _currentSubject.OnCompleted();
-            _subjects.OnCompleted();
+            currentSubject.OnCompleted();
+            subjects.OnCompleted();
             // a quick way to make the current ReplaySubject unreachable
             // except to in-flight observers, and not hold up collection
-            _currentSubject = new Subject<T>();
+            currentSubject = new Subject<T>();
         }
 
-        public IDisposable Subscribe(IObserver<T> observer) => _concatenatedSubjects.Subscribe(observer);
+        public IDisposable Subscribe(IObserver<T> observer) => concatenatedSubjects.Subscribe(observer);
 
         public IEnumerable<T> GetSnapshot()
         {
@@ -58,7 +58,7 @@ namespace FluentAssertions.Reactive
         public void Dispose()
         {
             OnCompleted();
-            _subjects?.Dispose();
+            subjects?.Dispose();
         }
     }
 }
