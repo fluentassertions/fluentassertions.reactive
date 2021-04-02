@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 using Microsoft.Reactive.Testing;
 
 namespace FluentAssertions.Reactive
@@ -74,6 +72,7 @@ namespace FluentAssertions.Reactive
         /// Creates a new <see cref="FluentTestObserver{TPayload}"/> which subscribes to the supplied <see cref="IObservable{T}"/>
         /// </summary>
         /// <param name="subject">the <see cref="IObservable{T}"/> under test</param>
+        /// <param name="scheduler">the scheduler used for observing the sequence</param>
         public FluentTestObserver(IObservable<TPayload> subject, IScheduler scheduler)
         {
             Subject = subject;
@@ -85,6 +84,7 @@ namespace FluentAssertions.Reactive
         /// Creates a new <see cref="FluentTestObserver{TPayload}"/> which subscribes to the supplied <see cref="IObservable{T}"/>
         /// </summary>
         /// <param name="subject">the <see cref="IObservable{T}"/> under test</param>
+        /// <param name="testScheduler">the test scheduler used to control notification timing</param>
         public FluentTestObserver(IObservable<TPayload> subject, TestScheduler testScheduler)
         {
             Subject = subject;
