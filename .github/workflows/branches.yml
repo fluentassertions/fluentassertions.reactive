@@ -21,8 +21,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Install dependencies
+        run: dotnet restore
       - name: Build solution
-        run: dotnet build -c Release
+        run: dotnet build -c Release --no-restore
       - name: Create NuGet packages
         run: dotnet pack -c Release --no-build -o nupkg
       - name: Upload nuget packages
@@ -38,12 +40,5 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Download version info file
-        uses: actions/download-artifact@v1
-        with:
-          name: gitversion
-          path: ./
-      - name: Inject version info into environment
-        run: cat ./gitversion.env >> $GITHUB_ENV
       - name: Run tests
-        run: echo "Current version is \"$GitVersion_SemVer\"" && dotnet test -c Release
+        run: dotnet test -c Release
