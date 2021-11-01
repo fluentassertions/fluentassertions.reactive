@@ -31,7 +31,7 @@ jobs:
 
   test:
     name: Test
-    needs: [build, generateVersionInfo]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
