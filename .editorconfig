@@ -134,3 +134,6 @@ dotnet_diagnostic.CA1309.severity = error
 
 # Banned API Analyzers
 dotnet_diagnostic.RS0030.severity = error
+
+# Configure await
+configure_await_analysis_mode = library
