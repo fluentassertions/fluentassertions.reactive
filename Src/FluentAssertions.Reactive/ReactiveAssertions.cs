@@ -89,7 +89,7 @@ namespace FluentAssertions.Reactive
                     .Timeout(timeout)
                     .Catch<TPayload, TimeoutException>(exception => Observable.Empty<TPayload>())
                     .ToList()
-                    .ToTask();
+                    .ToTask().ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -174,7 +174,7 @@ namespace FluentAssertions.Reactive
             string because = "", params object[] becauseArgs)
             where TException : Exception
         {
-            var notifications = await GetRecordedNotifications(timeout);
+            var notifications = await GetRecordedNotifications(timeout).ConfigureAwait(false);
             return Throw<TException>(notifications, because, becauseArgs);
         }
 
@@ -206,7 +206,7 @@ namespace FluentAssertions.Reactive
         public async Task<AndConstraint<ReactiveAssertions<TPayload>>> CompleteAsync(TimeSpan timeout,
             string because = "", params object[] becauseArgs)
         {
-            var notifications = await GetRecordedNotifications(timeout);
+            var notifications = await GetRecordedNotifications(timeout).ConfigureAwait(false);
 
             return Complete(timeout, because, becauseArgs, notifications);
         }

@@ -78,7 +78,7 @@ namespace FluentAssertions.Reactive
             this Task<AndWhichConstraint<ReactiveAssertions<TPayload>, IEnumerable<TPayload>>>
                 assertionTask)
         {
-            var constraint = await assertionTask;
+            var constraint = await assertionTask.ConfigureAwait(false);
             return constraint.Subject.LastOrDefault();
         }
         
