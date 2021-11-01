@@ -33,3 +33,7 @@ jobs:
         with:
           name: nupkg
           path: nupkg
+      - name: Publish Nuget to GitHub registry
+        run: dotnet nuget push ./nupkg/*.nupkg -s https://api.nuget.org/v3/index.json -k ${NUGET_API_KEY}  
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
