@@ -1,46 +1,48 @@
 name: Master workflow
-on: 
+on:
   push:
     branches:
       - master
-      - 'release/**'
-      - 'releases/**'
+      - "release/**"
+      - "releases/**"
     tags:
       - v*
       - V*
 env:
-  DOTNET_CLI_TELEMETRY_OPTOUT: true  
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
   MSBUILDSINGLELOADCONTEXT: 1
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Build solution
-      run: dotnet build -c Release
-    - name: Create NuGet packages
-      run: dotnet pack -c Release --no-build -o nupkg 
-    - name: Upload nuget packages
-      uses: actions/upload-artifact@v1
-      with:
-        name: nupkg
-        path: nupkg
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build solution
+        run: dotnet build -c Release
+      - name: Create NuGet packages
+        run: dotnet pack -c Release --no-build -o nupkg
+      - name: Upload nuget packages
+        uses: actions/upload-artifact@v1
+        with:
+          name: nupkg
+          path: nupkg
 
   test:
     name: Test
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Download version info file
-      uses: actions/download-artifact@v1
-      with:
-        name: gitversion
-        path: ./
-    - name: Inject version info into environment
-      run: cat ./gitversion.env >> $GITHUB_ENV
-    - name: Run tests
-      run: echo "Current version is \"$GitVersion_SemVer\"" && dotnet test -c Release
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download version info file
+        uses: actions/download-artifact@v1
+        with:
+          name: gitversion
+          path: ./
+      - name: Inject version info into environment
+        run: cat ./gitversion.env >> $GITHUB_ENV
+      - name: Run tests
+        run: echo "Current version is \"$GitVersion_SemVer\"" && dotnet test -c Release
