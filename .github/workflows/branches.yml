@@ -25,6 +25,8 @@ jobs:
         run: dotnet restore
       - name: Build solution
         run: dotnet build -c Release --no-restore
+      - name: Run tests
+        run: dotnet test -c Release --no-build
       - name: Create NuGet packages
         run: dotnet pack -c Release --no-build -o nupkg
       - name: Upload nuget packages
@@ -32,13 +34,3 @@ jobs:
         with:
           name: nupkg
           path: nupkg
-
-  test:
-    name: Test
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Run tests
-        run: dotnet test -c Release
