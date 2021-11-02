@@ -126,8 +126,7 @@ namespace FluentAssertions.Reactive.Specs
 
             observer.Error.Should().BeNull();
         }
-
-
+        
         [Fact]
         public void When_the_observable_completes_as_expected_it_should_not_throw()
         {
@@ -159,5 +158,27 @@ namespace FluentAssertions.Reactive.Specs
             observer.Error.Should().BeNull();
         }
 
+        [Fact]
+        public void When_the_observable_pushes_an_expected_match_it_should_not_throw()
+        {
+            var scheduler = new TestScheduler();
+            var observable = scheduler.CreateColdObservable(
+                OnNext(100, 1),
+                OnNext(200, 2),
+                OnNext(300, 3));
+
+            // observe the sequence
+            using var observer = observable.Observe(scheduler);
+            // push subscriptions
+            scheduler.AdvanceTo(400);
+
+            // Act
+            Action act = () => observer.Should().PushMatch(i => i > 1);
+
+            // Assert
+            act.Should().NotThrow();
+
+            observer.RecordedNotifications.Should().BeEquivalentTo(observable.Messages);
+        }
     }
 }
