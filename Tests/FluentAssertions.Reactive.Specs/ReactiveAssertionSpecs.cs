@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -50,20 +51,20 @@ namespace FluentAssertions.Reactive.Specs
 
             // assert a single notification
             // Act
-            Action act = () => observer.Should().Push(1, TimeSpan.Zero);
+            Action act = () => observer.Should().Push(1, TimeSpan.FromMilliseconds(1));
             // Assert
             act.Should().Throw<XunitException>().WithMessage(
-                $"Expected observable to push at least 1 notification, but 0 were received within {Formatter.ToString(TimeSpan.Zero)}.");
+                $"Expected observable to push at least 1 notification, but 0 were received within {Formatter.ToString(TimeSpan.FromMilliseconds(1))}.");
             observer.RecordedNotifications.Should().BeEmpty("because no messages have been pushed");
 
             // assert multiple notifications
             scheduler.AdvanceTo(250);
 
             // Act
-            act = () => observer.Should().Push(3, TimeSpan.Zero);
+            act = () => observer.Should().Push(3, TimeSpan.FromMilliseconds(1));
             // Assert
             act.Should().Throw<XunitException>().WithMessage(
-                $"Expected observable to push at least 3 notifications, but 2 were received within {Formatter.ToString(TimeSpan.Zero)}.");
+                $"Expected observable to push at least 3 notifications, but 2 were received within {Formatter.ToString(TimeSpan.FromMilliseconds(1))}.");
             observer.RecordedNotifications.Should().BeEquivalentTo(observable.Messages.Take(2));
         }
 
@@ -117,7 +118,7 @@ namespace FluentAssertions.Reactive.Specs
             using var observer = observable.Observe();
 
             // Act
-            Action act = () => observer.Should().Throw<ArgumentException>(TimeSpan.Zero);
+            Action act = () => observer.Should().Throw<ArgumentException>(TimeSpan.FromMilliseconds(1));
 
             // Assert
             act.Should().Throw<XunitException>().WithMessage(
@@ -151,10 +152,10 @@ namespace FluentAssertions.Reactive.Specs
             using var observer = observable.Observe();
 
             // Act
-            Action act = () => observer.Should().Complete(TimeSpan.Zero);
+            Action act = () => observer.Should().Complete(TimeSpan.FromMilliseconds(1));
             // Assert
             act.Should().Throw<XunitException>().WithMessage(
-                $"Expected observable to complete within {Formatter.ToString(TimeSpan.Zero)}, but it did not.");
+                $"Expected observable to complete within {Formatter.ToString(TimeSpan.FromMilliseconds(1))}, but it did not.");
             observer.Error.Should().BeNull();
         }
 
