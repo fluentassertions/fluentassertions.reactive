@@ -126,8 +126,7 @@ namespace FluentAssertions.Reactive.Specs
 
             observer.Error.Should().BeNull();
         }
-
-
+        
         [Fact]
         public void When_the_observable_completes_as_expected_it_should_not_throw()
         {
@@ -159,5 +158,68 @@ namespace FluentAssertions.Reactive.Specs
             observer.Error.Should().BeNull();
         }
 
+        [Fact]
+        public void When_the_observable_pushes_an_expected_match_it_should_not_throw()
+        {
+            var scheduler = new TestScheduler();
+            var observable = scheduler.CreateColdObservable(
+                OnNext(100, 1),
+                OnNext(200, 2));
+
+            // observe the sequence
+            using var observer = observable.Observe(scheduler);
+            // push subscriptions
+            scheduler.AdvanceTo(250);
+
+            // Act
+            Action act = () => observer.Should().PushMatch(i => i > 1);
+
+            // Assert
+            act.Should().NotThrow();
+
+            observer.RecordedNotifications.Should().BeEquivalentTo(observable.Messages);
+        }
+
+        [Fact]
+        public void When_the_observable_does_not_push_a_match_it_should_throw()
+        {
+            var scheduler = new TestScheduler();
+            var observable = scheduler.CreateColdObservable(
+                OnNext(100, 1),
+                OnNext(200, 2));
+
+            // observe the sequence
+            using var observer = observable.Observe(scheduler);
+            // push subscriptions
+            scheduler.AdvanceTo(250);
+
+            // Act
+            Action act = () => observer.Should().PushMatch(i => i > 3, TimeSpan.FromMilliseconds(1));
+
+            // Assert
+            act.Should().Throw<XunitException>().WithMessage(
+                $"Expected observable to push an item matching (i > 3) within {Formatter.ToString(TimeSpan.FromMilliseconds(1))}.");
+
+            observer.RecordedNotifications.Should().BeEquivalentTo(observable.Messages);
+        }
+
+        [Fact]
+        public void When_the_observable_fails_instead_of_pushing_a_match_it_should_throw()
+        {
+            var exception = new ArgumentException("That was wrong.");
+            var scheduler = new TestScheduler();
+            var observable = scheduler.CreateColdObservable(
+                OnError<int>(1, exception));
+
+            // observe the sequence
+            using var observer = observable.Observe(scheduler);
+            scheduler.AdvanceTo(10);
+            // Act
+            Action act = () => observer.Should().PushMatch(i => i > 1);
+            // Assert
+            act.Should().Throw<XunitException>().WithMessage(
+                $"Expected observable to push an item matching (i > 1), but it failed with a {Formatter.ToString(exception)}.");
+            observer.Error.Should().BeEquivalentTo(exception);
+        }
     }
 }
