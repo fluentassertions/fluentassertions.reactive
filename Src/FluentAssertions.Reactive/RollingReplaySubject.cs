@@ -1,53 +1,100 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
 namespace FluentAssertions.Reactive
 {
     /// <summary>
-    /// Clearable <see cref="ReplaySubject{T}"/> taken from James World: https://stackoverflow.com/a/28945444/4340541
+    /// Clearable <see cref="ReplaySubject{T}"/> taken from James World: https://gist.github.com/james-world/c46f09f32e2d4f338b07
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class RollingReplaySubject<T> : ISubject<T>, IDisposable
+    public class RollingReplaySubject
     {
-        private readonly ReplaySubject<IObservable<T>> subjects;
-        private readonly IObservable<T> concatenatedSubjects;
-        private ISubject<T> currentSubject;
+        protected class NopSubject<TSource> : ISubject<TSource>
+        {
+            public static readonly NopSubject<TSource> Default = new NopSubject<TSource>();
+
+            public void OnCompleted()
+            {
+            }
+
+            public void OnError(Exception error)
+            {
+            }
+
+            public void OnNext(TSource value)
+            {
+            }
+
+            public IDisposable Subscribe(IObserver<TSource> observer)
+            {
+                return Disposable.Empty;
+            }
+        }
+    }
+
+    public class RollingReplaySubject<TSource> : RollingReplaySubject, ISubject<TSource>
+    {
+        private readonly ReplaySubject<IObservable<TSource>> _subjects;
+        private readonly IObservable<TSource> _concatenatedSubjects;
+        private ISubject<TSource> _currentSubject;
+        private readonly object _gate = new object();
 
         public RollingReplaySubject()
         {
-            subjects = new ReplaySubject<IObservable<T>>(1);
-            concatenatedSubjects = subjects.Concat();
-            currentSubject = new ReplaySubject<T>();
-            subjects.OnNext(currentSubject);
+            _subjects = new ReplaySubject<IObservable<TSource>>(1);
+            _concatenatedSubjects = _subjects.Concat();
+            _currentSubject = new ReplaySubject<TSource>();
+            _subjects.OnNext(_currentSubject);
         }
-
+        
         public void Clear()
         {
-            currentSubject.OnCompleted();
-            currentSubject = new ReplaySubject<T>();
-            subjects.OnNext(currentSubject);
+            lock (_gate)
+            {
+                _currentSubject.OnCompleted();
+                _currentSubject = new ReplaySubject<TSource>();
+                _subjects.OnNext(_currentSubject);
+            }
         }
 
-        public void OnNext(T value) => currentSubject.OnNext(value);
+        public void OnNext(TSource value)
+        {
+            lock (_gate)
+            {
+                _currentSubject.OnNext(value);
+            }
+        }
 
-        public void OnError(Exception error) => currentSubject.OnError(error);
+        public void OnError(Exception error)
+        {
+            lock (_gate)
+            {
+                _currentSubject.OnError(error);
+                _currentSubject = NopSubject<TSource>.Default;
+            }
+        }
 
         public void OnCompleted()
         {
-            currentSubject.OnCompleted();
-            subjects.OnCompleted();
-            // a quick way to make the current ReplaySubject unreachable
-            // except to in-flight observers, and not hold up collection
-            currentSubject = new Subject<T>();
+            lock (_gate)
+            {
+                _currentSubject.OnCompleted();
+                _subjects.OnCompleted();
+                _currentSubject = NopSubject<TSource>.Default;
+            }
         }
 
-        public IDisposable Subscribe(IObserver<T> observer) => concatenatedSubjects.Subscribe(observer);
-
-        public IEnumerable<T> GetSnapshot()
+        public IDisposable Subscribe(IObserver<TSource> observer)
         {
-            var snapshot = new List<T>();
+            return _concatenatedSubjects.Subscribe(observer);
+        }
+
+        public IEnumerable<TSource> GetSnapshot()
+        {
+            var snapshot = new List<TSource>();
             using (this.Subscribe(item => snapshot.Add(item)))
             {
                 // Deliberately empty; subscribing will add everything to the list.
@@ -58,7 +105,7 @@ namespace FluentAssertions.Reactive
         public void Dispose()
         {
             OnCompleted();
-            subjects?.Dispose();
+            _subjects?.Dispose();
         }
     }
 }
