@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -9,6 +10,7 @@ using FluentAssertions.Common;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using FluentAssertions.Specialized;
+using JetBrains.Annotations;
 using Microsoft.Reactive.Testing;
 
 namespace FluentAssertions.Reactive
@@ -247,6 +249,98 @@ namespace FluentAssertions.Reactive
         /// </summary>
         public AndConstraint<ReactiveAssertions<TPayload>> NotComplete(string because = "", params object[] becauseArgs)
             => NotComplete(TimeSpan.FromMilliseconds(100), because, becauseArgs);
+
+
+        /// <summary>
+        /// Asserts that at least one notification matching <paramref name="predicate"/> was pushed to the <see cref="FluentTestObserver{TPayload}"/>
+        /// within the specified <paramref name="timeout"/>.<br />
+        /// This includes any previously recorded notifications since it has been created or cleared.
+        /// </summary>
+        /// <param name="predicate">A predicate to match the items in the collection against.</param>
+        /// <param name="timeout">the maximum time to wait for the notification to arrive</param>
+        /// <param name="because">
+        /// A formatted phrase as is supported by <see cref="string.Format(string,object[])" /> explaining why the assertion
+        /// is needed. If the phrase does not start with the word <i>because</i>, it is prepended automatically.
+        /// </param>
+        /// <param name="becauseArgs">
+        /// Zero or more objects to format using the placeholders in <paramref name="because"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <c>null</c>.</exception>
+        public AndConstraint<ReactiveAssertions<TPayload>> PushMatch([NotNull] Expression<Func<TPayload, bool>> predicate, TimeSpan timeout, string because = "", params object[] becauseArgs)
+        {
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+            IList<TPayload> notifications = new List<TPayload>();
+            AssertionScope assertion = Execute.Assertion
+                .WithExpectation("Expected {context:observable} {0} to push an item matching {1}{reason}", Subject, predicate.Body)
+                .BecauseOf(because, becauseArgs);
+
+            try
+            {
+                Func<TPayload, bool> func = predicate.Compile();
+                notifications = Observer.RecordedNotificationStream
+                    .Select(r => r.Value)
+                    .Dematerialize()
+                    .Where(func)
+                    .Take(1)
+                    .Timeout(timeout)
+                    .Catch<TPayload, TimeoutException>(exception => Observable.Empty<TPayload>())
+                    .ToList()
+                    .ToTask()
+                    .ExecuteInDefaultSynchronizationContext();
+            }
+            catch (Exception e)
+            {
+                if (e is AggregateException aggregateException)
+                    e = aggregateException.InnerException;
+                assertion.FailWith(", but it failed with a {0}.", e);
+            }
+            
+            assertion
+                .ForCondition(notifications.Any())
+                .FailWith(" within {0}.", timeout);
+
+            return new AndConstraint<ReactiveAssertions<TPayload>>(this);
+        }
+
+        /// <inheritdoc cref="PushMatch"/>
+        public async Task<AndConstraint<ReactiveAssertions<TPayload>>> PushMatchAsync([NotNull] Expression<Func<TPayload, bool>> predicate, TimeSpan timeout,
+            string because = "", params object[] becauseArgs)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            IList<TPayload> notifications = new List<TPayload>();
+            AssertionScope assertion = Execute.Assertion
+                .WithExpectation("Expected {context:observable} {0} to push an item matching {1}{reason}", Subject, predicate.Body)
+                .BecauseOf(because, becauseArgs);
+
+            try
+            {
+                Func<TPayload, bool> func = predicate.Compile();
+                notifications = await Observer.RecordedNotificationStream
+                    .Select(r => r.Value)
+                    .Dematerialize()
+                    .Where(func)
+                    .Take(1)
+                    .Timeout(timeout)
+                    .Catch<TPayload, TimeoutException>(exception => Observable.Empty<TPayload>())
+                    .ToList()
+                    .ToTask().ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                if (e is AggregateException aggregateException)
+                    e = aggregateException.InnerException;
+                assertion.FailWith(", but it failed with a {0}.", e);
+            }
+
+            assertion
+                .ForCondition(notifications.Any())
+                .FailWith(" within {0}.", timeout);
+
+            return new AndWhichConstraint<ReactiveAssertions<TPayload>, IEnumerable<TPayload>>(this, notifications);
+        }
 
         protected Task<IList<Recorded<Notification<TPayload>>>> GetRecordedNotifications(TimeSpan timeout) =>
             Observer.RecordedNotificationStream
