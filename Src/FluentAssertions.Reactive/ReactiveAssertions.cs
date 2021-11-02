@@ -275,9 +275,6 @@ namespace FluentAssertions.Reactive
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
             IList<TPayload> notifications = new List<TPayload>();
-            AssertionScope assertion = Execute.Assertion
-                .WithExpectation("Expected {context:observable} {0} to push an item matching {1}{reason}", Subject, predicate.Body)
-                .BecauseOf(because, becauseArgs);
 
             try
             {
@@ -297,12 +294,15 @@ namespace FluentAssertions.Reactive
             {
                 if (e is AggregateException aggregateException)
                     e = aggregateException.InnerException;
-                assertion.FailWith(", but it failed with a {0}.", e);
+                Execute.Assertion
+                    .BecauseOf(because, becauseArgs)
+                    .FailWith("Expected {context:observable} to push an item matching {0}{reason}, but it failed with a {1}.", predicate.Body, e);
             }
-            
-            assertion
+
+            Execute.Assertion
+                .BecauseOf(because, becauseArgs)
                 .ForCondition(notifications.Any())
-                .FailWith(" within {0}.", timeout);
+                .FailWith("Expected {context:observable} to push an item matching {0}{reason} within {1}.", predicate.Body, timeout);
 
             return new AndConstraint<ReactiveAssertions<TPayload>>(this);
         }
@@ -339,9 +339,6 @@ namespace FluentAssertions.Reactive
                 throw new ArgumentNullException(nameof(predicate));
 
             IList<TPayload> notifications = new List<TPayload>();
-            AssertionScope assertion = Execute.Assertion
-                .WithExpectation("Expected {context:observable} {0} to push an item matching {1}{reason}", Subject, predicate.Body)
-                .BecauseOf(because, becauseArgs);
 
             try
             {
@@ -360,12 +357,15 @@ namespace FluentAssertions.Reactive
             {
                 if (e is AggregateException aggregateException)
                     e = aggregateException.InnerException;
-                assertion.FailWith(", but it failed with a {0}.", e);
+                Execute.Assertion
+                    .BecauseOf(because, becauseArgs)
+                    .FailWith("Expected {context:observable} to push an item matching {0}{reason}, but it failed with a {1}.", predicate.Body, e);
             }
 
-            assertion
+            Execute.Assertion
+                .BecauseOf(because, becauseArgs)
                 .ForCondition(notifications.Any())
-                .FailWith(" within {0}.", timeout);
+                .FailWith("Expected {context:observable} to push an item matching {0}{reason} within {1}.", predicate.Body, timeout);
 
             return new AndWhichConstraint<ReactiveAssertions<TPayload>, IEnumerable<TPayload>>(this, notifications);
         }
